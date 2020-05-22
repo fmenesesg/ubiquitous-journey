@@ -186,10 +186,24 @@ owncloud_values: &owncloud_values
   route:
     enabled: true
   hostname: owncloud.apps.hivec.sandbox1559.opentlc.com
-
+  
+##############
+# 🛎 GOGS Custom Values
+# Values reference https://hub.helm.sh/charts/incubator/gogs
+#############
+gogs_values: &gogs_values
+  serviceType: "ClusterIP"
+ 
 ##############
 # 🐙 Argo Ignore Differences
 #############
+gogs_ignore_differences: &gogs_ignore_differences
+  ignoreDifferences:
+  - group: apps.openshift.io
+    kind: DeploymentConfig
+    jsonPointers:
+    - /spec/template/spec/containers/0/image
+    - /spec/triggers/0/imageChangeParams/lastTriggeredImage
 jenkins_ignore_differences: &jenkins_ignore_differences
   ignoreDifferences:
   - group: apps.openshift.io
@@ -271,6 +285,18 @@ sync_policy_no_selfheal: &sync_policy_no_selfheal
 
 # enabled true on an app is to tell helm to create an argo app cr for this item
 applications:
+  gogs_values
+  - name: gogs
+    enabled: true
+    source: https://github.com/helm/charts.git
+    source_path: incubator/gogs
+    source_ref: "master"
+    sync_policy:
+      *sync_policy_true
+    destination: *ci_cd_ns
+    values:
+      *gogs_values
+    ignore_differences: *gogs_ignore_differences
   - name: nexus
     enabled: true
     source: https://github.com/Oteemo/charts.git
