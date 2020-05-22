@@ -204,6 +204,7 @@ gogs_ignore_differences: &gogs_ignore_differences
     jsonPointers:
     - /spec/template/spec/containers/0/image
     - /spec/triggers/0/imageChangeParams/lastTriggeredImage
+    
 jenkins_ignore_differences: &jenkins_ignore_differences
   ignoreDifferences:
   - group: apps.openshift.io
@@ -285,7 +286,6 @@ sync_policy_no_selfheal: &sync_policy_no_selfheal
 
 # enabled true on an app is to tell helm to create an argo app cr for this item
 applications:
-  gogs_values
   - name: gogs
     enabled: true
     source: https://github.com/helm/charts.git
