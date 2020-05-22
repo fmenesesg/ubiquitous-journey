@@ -188,16 +188,25 @@ owncloud_values: &owncloud_values
   hostname: owncloud.apps.hivec.sandbox1559.opentlc.com
   
 ##############
-# 🛎 GOGS Custom Values
-# Values reference https://hub.helm.sh/charts/incubator/gogs
+# 🛎 Gitea Custom Values
+# Values reference https://charts.k8s.land
 #############
-gogs_values: &gogs_values
-  serviceType: "ClusterIP"
+gitea_values: &gitea_values
+  ingress:
+    enabled: true
+  existingGiteaClaim: gitea-gitea
+  mariadb:
+    persistence:
+      enabled: true
+  persistence:
+    enabled: true
+    annotations:
+      "helm.sh/resource-policy": keep
  
 ##############
 # 🐙 Argo Ignore Differences
 #############
-gogs_ignore_differences: &gogs_ignore_differences
+gitea_ignore_differences: &gitea_ignore_differences
   ignoreDifferences:
   - group: apps.openshift.io
     kind: DeploymentConfig
@@ -286,17 +295,16 @@ sync_policy_no_selfheal: &sync_policy_no_selfheal
 
 # enabled true on an app is to tell helm to create an argo app cr for this item
 applications:
-  - name: gogs
+  - name: gitea
     enabled: true
-    source: https://github.com/helm/charts.git
-    source_path: incubator/gogs
+    source: https://github.com/k8s-land/gitea-chart.git
     source_ref: "master"
     sync_policy:
       *sync_policy_true
     destination: *ci_cd_ns
     values:
-      *gogs_values
-    ignore_differences: *gogs_ignore_differences
+      *gitea_values
+    ignore_differences: *gitea_ignore_differences
   - name: nexus
     enabled: true
     source: https://github.com/Oteemo/charts.git
